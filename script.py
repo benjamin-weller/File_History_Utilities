@@ -1,6 +1,5 @@
 import stat
 import os
-import subprocess
 from datetime import datetime
 
 
@@ -10,9 +9,8 @@ def compareDateStrings(strOne, strTwo):
     #I am asuming that the format of both of these strings will be
     #YYYY_MM_DD HH_MM_SS "UTC"
     #I'll make a substring of both strings that only has the first 10 digits
-
-    strOneSplit=strOne[1:10].split(sep="_")
-    strTwoSplit = strTwo[1:10].split(sep="_")
+    strOneSplit=strOne[1:11].split(sep="_")
+    strTwoSplit = strTwo[1:11].split(sep="_")
 
 
     first_date=datetime(int(strOneSplit[0]), int(strOneSplit[1]), int(strOneSplit[2]))
@@ -37,7 +35,7 @@ def onlyDatePortion(file):
 
 dictionary = {}
 
-for file in os.listdir("."):
+for file in os.listdir("C:\\Users\\Owner\\Documents"):
     if ("(201" in file):
         # Remove the time stamp parenthesis
         file_name = onlyFileName(file)
@@ -60,7 +58,3 @@ for file in os.listdir("."):
             # Add to the dictionary
             dictionary[file_name] = file
 renameFiles()
-#
-# if __name__=="_main_":
-#     removeOldFiles()
-#     renameFiles()
