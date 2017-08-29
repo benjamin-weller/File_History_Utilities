@@ -1,3 +1,4 @@
+import stat
 import os
 import subprocess
 from datetime import datetime
@@ -22,53 +23,44 @@ def compareDateStrings(strOne, strTwo):
     else:
         return False
 
-def makeFileWritable(file):
-    subprocess.run("attrib", "-r", file)
-
 def renameFiles():
     for file in os.listdir("."):
-        os.rename(file, file[:indexOfParentheses].strip() + file[indexOfExtension:].strip())
+        if ("(201" in file):
+            os.chmod(file, stat.S_IWRITE)
+            os.rename(file, file[:file.find("(")].strip() + file[file.find("."):].strip())
 
-dictionary={}
+def onlyFileName(file):
+    return file[:file.find("(")].strip() + file[file.find("."):].strip()
+
+def onlyDatePortion(file):
+    return file[file.find("("):file.find(".")].strip()
+
+dictionary = {}
 
 for file in os.listdir("."):
     if ("(201" in file):
-        #Now get the index of the first parenthesis
-        indexOfParentheses=file.find("(")
-        indexOfExtension=file.find(".")
+        # Remove the time stamp parenthesis
+        file_name = onlyFileName(file)
 
-        #Remove the parenthesis
-        file_name= file[:indexOfParentheses].strip() + file[indexOfExtension:].strip()
-
-        #Check to see if the associative array has a key
+        # Check to see if the associative array has a key
         if (file_name in dictionary):
-            #Then we should get the old value out and compare the two
-            oldValue=dictionary[file_name]
+            # Then we should get the old value out and compare the two
+            oldValue = dictionary[file_name]
 
-            #I'm going to capture only the date portion of the strings
-            newFile=file[indexOfParentheses:indexOfExtension].strip()
-            oldFile=oldValue[file.find("("):file.find(".")].strip()
-
-            if not compareDateStrings(oldFile, newFile):
-            #I can't rely upon basic python lexicographic evaluation simply because our days and month go beyond one digit
-            #if oldValue<file:
-                #Remove the chronologically older file
+            if not compareDateStrings(onlyDatePortion(oldValue), onlyDatePortion(file)):
+                # Remove the chronologically older file
+                os.chmod(oldValue, stat.S_IWRITE)
                 os.remove(oldValue)
-                #Update the dictionary so it stays current
-                dictionary[file_name]=file
-
-                #Going to make the neweset file writable
- #               makeFileWritable(file)
+                # Update the dictionary so it stays current
+                dictionary[file_name] = file
             else:
-                #Remove the chronologically older file
+                # Remove the chronologically older file
                 os.remove(file)
-
         else:
-            #Add to the dictionary
-            dictionary[file_name]=file
-#            makeFileWritable(file)
-
+            # Add to the dictionary
+            dictionary[file_name] = file
 renameFiles()
-
-
-        #os.rename(file, fileName+extension) #For later use
+#
+# if __name__=="_main_":
+#     removeOldFiles()
+#     renameFiles()
