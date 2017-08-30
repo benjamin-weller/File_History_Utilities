@@ -12,7 +12,7 @@ def compare_date_strings(str_one: str, str_two: str) -> bool:
 
     str_one_split = str_one.split(sep="_")
     str_two_split = str_two.split(sep="_")
-    
+
     first_date = datetime(int(str_one_split[0]), int(str_one_split[1]), int(str_one_split[2]),
                           hour=int(str_one_split[3]), minute=int(str_one_split[4]),
                           second=int(str_one_split[5]))
@@ -23,9 +23,9 @@ def compare_date_strings(str_one: str, str_two: str) -> bool:
     return bool(first_date > second_date)
 
 
-def rename_files():
+def rename_files(list_of_files):
     """This method does all the logic for renaming the remaining files."""
-    for file in os.listdir("."):
+    for file in list_of_files:
         if "(201" in file:
             os.chmod(file, stat.S_IWRITE)
             os.rename(file, only_file_name(file))
@@ -46,11 +46,11 @@ def only_date_portion(file: str) -> str:
     return file[start_of_date:date_string_length].strip().replace(" ", "_")
 
 
-def remove_old_files():
+def remove_old_files(list_of_files):
     """This method does all the logic for removing old files."""
     dictionary = {}
 
-    for file in os.listdir("."):
+    for file in list_of_files:
         if "(201" in file:
             # Remove the time stamp parenthesis
             file_name = only_file_name(file)
@@ -72,6 +72,18 @@ def remove_old_files():
             else:
                 # Add to the dictionary
                 dictionary[file_name] = file
+
+
+def recursive_walk(path_to_rootdir):
+    """This recursive method will start at a specified directory, walk from the top down, renaming and removing files as it goes."""
+    dirpath, dirdirectories, dirfiles = os.walk(path_to_rootdir)
+
+    #Going to call my remove and rename old files methods
+    remove_old_files(dirfiles)
+    # Going to have to make my remove_old_files method return a list of files that actually exist
+
+    for direcory in dirdirectories:
+        recursive_walk(os.path.join(dirpath, direcory))
 
 
 if __name__ == "__main__":
