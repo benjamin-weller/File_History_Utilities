@@ -6,17 +6,19 @@ from datetime import datetime
 files from the File Histroy backup (Windows backup utility).  Please consult my readme on github for details."""
 
 def compare_date_strings(str_one: str, str_two: str) -> bool:
-    """This method takes in two "date strings" from a file name,
-    it returns true if string one's date is greater than string two's date.
-    I am asuming that the format of both of these parameters will be: YYYY_MM_DD HH_MM_SS "UTC"."""
+    """This method takes in two "date strings" from a file name.
+    It returns true if string one's date is greater than string two's date.
+    I am asuming that the format of both of these parameters will be: YYYY_MM_DD_HH_MM_SS."""
 
-    #I'll make a substring of both strings that only has the first 10 digits
     str_one_split = str_one.split(sep="_")
     str_two_split = str_two.split(sep="_")
-
-
-    first_date = datetime(int(str_one_split[0]), int(str_one_split[1]), int(str_one_split[2]))
-    second_date = datetime(int(str_two_split[0]), int(str_two_split[1]), int(str_two_split[2]))
+    
+    first_date = datetime(int(str_one_split[0]), int(str_one_split[1]), int(str_one_split[2]),
+                          hour=int(str_one_split[3]), minute=int(str_one_split[4]),
+                          second=int(str_one_split[5]))
+    second_date = datetime(int(str_two_split[0]), int(str_two_split[1]), int(str_two_split[2]),
+                           hour=int(str_two_split[3]), minute=int(str_two_split[4]),
+                           second=int(str_two_split[5]))
 
     return bool(first_date > second_date)
 
@@ -26,19 +28,22 @@ def rename_files():
     for file in os.listdir("."):
         if "(201" in file:
             os.chmod(file, stat.S_IWRITE)
-            os.rename(file, file[:file.find("(")].strip() + file[file.find("."):].strip())
+            os.rename(file, only_file_name(file))
 
 
-def only_file_name(file: str):
+def only_file_name(file: str) -> str:
     """This method takes in a file name and returns only the name and extension of that file."""
     return file[:file.find("(")].strip() + file[file.find("."):].strip()
 
 
-def only_date_portion(file: str):
-    """This method takes in a file name and returns only the date portion of the String."""
+def only_date_portion(file: str) -> str:
+    """This method takes in a file name and returns only the date and time portion of the String."""
+
+    #The entire string length is 19.
     start_of_date = file.find("(")+1
-    date_string_length = 10 + start_of_date
-    return file[start_of_date:date_string_length].strip()
+    date_string_length = 19 + start_of_date
+    #Returns the string in the format I need for easy comparisions
+    return file[start_of_date:date_string_length].strip().replace(" ", "_")
 
 
 def remove_old_files():
