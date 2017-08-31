@@ -38,9 +38,7 @@ def only_file_name(file: str) -> str:
     #The below line is safe becuase I checked for it before
     result = re.search(r"\d{4}_\d{2}_\d{2} \d{2}_\d{2}_\d{2} UTC", file)
 
-    # It would be great to do something simply like file[len(file)-4],
-    # but some files have extensions more than 3 letters
-    return file[:result.start()-1].strip() + file[file.find("."):]
+    return file[:result.start()-1].strip() + file[file.rfind("."):]
 
 
 def only_date_portion(file: str) -> str:
