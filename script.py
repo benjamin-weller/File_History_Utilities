@@ -27,31 +27,33 @@ def compare_date_strings(str_one: str, str_two: str) -> bool:
 def rename_files():
     """This method does all the logic for renaming the remaining files."""
     for file in os.listdir("."):
-        os.chmod(file, stat.S_IWRITE)
-        os.rename(file, only_file_name(file))
+        if re.search(r"\d{4}_\d{2}_\d{2} \d{2}_\d{2}_\d{2} UTC", file):
+            os.chmod(file, stat.S_IWRITE)
+            os.rename(file, only_file_name(file))
 
 
 def only_file_name(file: str) -> str:
     """This method takes in a file name and returns only the name and extension of that file."""
 
+    #The below line is safe becuase I checked for it before
     result = re.search(r"\d{4}_\d{2}_\d{2} \d{2}_\d{2}_\d{2} UTC", file)
-    file[:result.start()-1]+ file[file.find("."):]
+
     # It would be great to do something simply like file[len(file)-4],
     # but some files have extensions more than 3 letters
-    return file[:file.find("(201")].strip() + file[file.find("."):].strip()
+    return file[:result.start()-1].strip() + file[file.find("."):]
 
 
 def only_date_portion(file: str) -> str:
     """This method takes in a file name and returns only the date and time portion of the String."""
 
-    #The entire time stamp length is 19.
-    start_of_date = file.find("(201")+1
-    date_string_length = 19 + start_of_date
+    # The below line is safe becuase I checked for it before
+    result = re.search(r"\d{4}_\d{2}_\d{2} \d{2}_\d{2}_\d{2}", file)
+
     #Returns the string in the format I need for easy comparisions
-    return file[start_of_date:date_string_length].strip().replace(" ", "_")
+    return file[result.start():result.end()].replace(" ", "_")
 
 
-def remove_old_files(list_of_files):
+def remove_old_files():
     """This method does all the logic for removing old files."""
     dictionary = {}
 
