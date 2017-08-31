@@ -25,7 +25,8 @@ def compare_date_strings(str_one: str, str_two: str) -> bool:
 
 def rename_files(list_of_files):
     """This method does all the logic for renaming the remaining files."""
-    for file in list_of_files:
+    for file in os.listdir("."):
+    # for file in list_of_files:
         if "(201" in file:
             os.chmod(file, stat.S_IWRITE)
             os.rename(file, only_file_name(file))
@@ -33,14 +34,14 @@ def rename_files(list_of_files):
 
 def only_file_name(file: str) -> str:
     """This method takes in a file name and returns only the name and extension of that file."""
-    return file[:file.find("(")].strip() + file[file.find("."):].strip()
+    return file[:file.find("(201")].strip() + file[file.find("."):].strip()
 
 
 def only_date_portion(file: str) -> str:
     """This method takes in a file name and returns only the date and time portion of the String."""
 
     #The entire string length is 19.
-    start_of_date = file.find("(")+1
+    start_of_date = file.find("(201")+1
     date_string_length = 19 + start_of_date
     #Returns the string in the format I need for easy comparisions
     return file[start_of_date:date_string_length].strip().replace(" ", "_")
@@ -49,8 +50,9 @@ def only_date_portion(file: str) -> str:
 def remove_old_files(list_of_files):
     """This method does all the logic for removing old files."""
     dictionary = {}
-
-    for file in list_of_files:
+    #iterator=iter(list_of_files) #I think I need to do this otherwise I will be delete on a list while looping
+    for file in os.listdir("."):
+    # for file in list_of_files:
         if "(201" in file:
             # Remove the time stamp parenthesis
             file_name = only_file_name(file)
@@ -64,28 +66,41 @@ def remove_old_files(list_of_files):
                     # Remove the chronologically older file
                     os.chmod(old_value, stat.S_IWRITE)
                     os.remove(old_value)
+                    list_of_files.remove(old_value)
                     # Update the dictionary so it stays current
                     dictionary[file_name] = file
                 else:
                     # Remove the chronologically older file
+                    os.chmod(file, stat.S_IWRITE)
                     os.remove(file)
+                    list_of_files.remove(file)
             else:
                 # Add to the dictionary
                 dictionary[file_name] = file
+    return list_of_files
 
 
 def recursive_walk(path_to_rootdir):
     """This recursive method will start at a specified directory, walk from the top down, renaming and removing files as it goes."""
-    dirpath, dirdirectories, dirfiles = os.walk(path_to_rootdir)
 
-    #Going to call my remove and rename old files methods
-    remove_old_files(dirfiles)
-    # Going to have to make my remove_old_files method return a list of files that actually exist
+    for my_tuple in os.walk(path_to_rootdir):
+        dirpath, dirdirectories, dirfiles = my_tuple
+        os.chdir(dirpath)
+        existing_files = remove_old_files(os.listdir(dirpath))
+        rename_files(existing_files)
 
-    for direcory in dirdirectories:
-        recursive_walk(os.path.join(dirpath, direcory))
+    # dirpath, dirdirectories, dirfiles = os.walk(path_to_rootdir)
+    #
+    # #Going to call my remove and rename old files methods
+    # existing_files=remove_old_files(dirfiles)
+    # rename_files(existing_files)
+    #
+    # for direcory in dirdirectories:
+    #     recursive_walk(os.path.join(dirpath, direcory))
+    # #Implicit return here
 
 
 if __name__ == "__main__":
-    remove_old_files()
-    rename_files()
+    path = input("Please enter a root directory for the beginning of the recursive rename: ")
+    assert os.path.exists(path), "I did not find the directory at, "+str(path)
+    recursive_walk(path)
