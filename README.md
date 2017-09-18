@@ -1,5 +1,5 @@
-# File_History_Utilities
-I have been getting up early to program in the morning, this plays well with my goal to program for an hour each day. As a result, from these two happenings I decided to start this project. I tried to take it slow and estimate the length of time this project would take (I initially thought three hours, but it turned out to be six). On a final note for the first three hours I forced myself to only work on them an hour each day, doing this I learned a lot about switching costs, and the power of flow.
+# **File_History_Utilities**
+A project that aims to get rid of the time stamp after taking files out of file history on windows.
 
 **First(s) during this project**
 1.	Honestly trying idiomatic Python
@@ -9,12 +9,12 @@ I have been getting up early to program in the morning, this plays well with my 
 
 **What I learned:**
 1.	Python is awesome!
-2.	Estimations are hard
+2.	Estimations are hard (planned for 3 hours, and actually used 6)
 3.	Feature creep is a real thing (I thought I was done at hour 2)
 4.	Refer to the first point
 5.	Go with the flow (don’t “break the chain”)
 
-**Problem:**
+# Problem:
 
 I was switching between operating systems and decided to make a fresh install of Windows. I use the File History backup feature on an external drive. It’s great to have backups but when I copied everything over, all my files had odd timestamps associated with them. I knew due to the magnitude of the problem that I wouldn’t be trying to solve this issue with simple batch file scripting. I instead chose to more fun and versatile tool, Python. 
 
@@ -27,7 +27,7 @@ I was switching between operating systems and decided to make a fresh install of
 
 ![problem picture](https://user-images.githubusercontent.com/22554871/29929432-8712a358-8e39-11e7-946b-2b700d074fec.png)
 
-**Solution:**
+# Solution:
 
 I developed a program that used regular expressions and some very handy methods from the os module to complete my aims.
 

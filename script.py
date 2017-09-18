@@ -3,8 +3,10 @@ import stat
 import os
 from datetime import datetime
 
+
 """This program was written to solve an issue I had when moving between operating systems and copying over my
 files from the File Histroy backup (Windows backup utility).  Please consult my readme on github for details."""
+
 
 def compare_date_strings(str_one: str, str_two: str) -> bool:
     """This method takes in two "date strings" from a file name.
@@ -27,18 +29,23 @@ def compare_date_strings(str_one: str, str_two: str) -> bool:
 def rename_files():
     """This method does all the logic for renaming the remaining files."""
     for file in os.listdir("."):
-        if re.search(r"\d{4}_\d{2}_\d{2} \d{2}_\d{2}_\d{2} UTC", file):
-            os.chmod(file, stat.S_IWRITE)
-            os.rename(file, only_file_name(file))
+        try:
+            if re.search(r"\d{4}_\d{2}_\d{2} \d{2}_\d{2}_\d{2} UTC", file):
+                os.chmod(file, stat.S_IWRITE)
+                os.rename(file, only_file_name(file))
+        except WindowsError:
+            print("It appears we can't rename " + file +
+                  " to " + only_file_name(file) + " because a file by that name already exists.")
+            print("Please navigate to " + os.getcwd() + " and resolve this problem.")
 
 
 def only_file_name(file: str) -> str:
     """This method takes in a file name and returns only the name and extension of that file."""
 
-    #The below line is safe becuase I checked for it before
+    # The below line is safe becuase I checked for it before
     result = re.search(r"\d{4}_\d{2}_\d{2} \d{2}_\d{2}_\d{2} UTC", file)
 
-    return file[:result.start()-1].strip() + file[file.rfind("."):]
+    return file[:result.start() - 1].strip() + file[file.rfind("."):]
 
 
 def only_date_portion(file: str) -> str:
@@ -47,7 +54,7 @@ def only_date_portion(file: str) -> str:
     # The below line is safe becuase I checked for it before
     result = re.search(r"\d{4}_\d{2}_\d{2} \d{2}_\d{2}_\d{2}", file)
 
-    #Returns the string in the format I need for easy comparisions
+    # Returns the string in the format I need for easy comparisions
     return file[result.start():result.end()].replace(" ", "_")
 
 
@@ -92,5 +99,5 @@ def recursive_walk(path_to_rootdir):
 
 if __name__ == "__main__":
     path = input("Please enter a root directory for the beginning of the recursive rename: ")
-    assert os.path.exists(path), "I did not find the directory at, "+str(path)
+    assert os.path.exists(path), "I did not find the directory at, " + str(path)
     recursive_walk(path)
